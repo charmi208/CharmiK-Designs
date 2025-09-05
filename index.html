@@ -29,7 +29,6 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-  
   </head>
 
   <body>
@@ -663,7 +662,7 @@
                 data-category="Video Editing"
               >
                 <a
-                  href="/CharmiK-Designs/assets/images/monthly_video_grc_2.mp4"
+                  href="./assets/images/monthly_video_grc_2.mp4"
                   target="_blank"
                   rel="noopener"
                 >
@@ -673,14 +672,16 @@
                     </div>
                     <video
                       class="project-video"
-                      data-src="/CharmiK-Designs/assets/images/monthly_video_grc_2.mp4"
                       muted
                       autoplay
                       loop
                       playsinline
                       preload="none"
                     >
-                      <source type="video/mp4" />
+                      <source
+                        src="./assets/images/monthly_video_grc_2.mp4"
+                        type="video/mp4"
+                      />
                       Your browser does not support HTML5 video.
                     </video>
                   </figure>
@@ -2217,109 +2218,129 @@
       </div>
     </main>
 
-   <!-- Ionicons -->
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <!-- Ionicons -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Category filtering
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            const projectItems = document.querySelectorAll('.project-item');
-            
-            filterButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    // Remove active class from all buttons
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    // Add active class to clicked button
-                    button.classList.add('active');
-                    
-                    const filter = button.getAttribute('data-filter');
-                    
-                    projectItems.forEach(item => {
-                        if (filter === 'all' || item.getAttribute('data-category') === filter) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
+      document.addEventListener("DOMContentLoaded", () => {
+        // Category filtering
+        const filterButtons = document.querySelectorAll(".filter-btn");
+        const projectItems = document.querySelectorAll(".project-item");
+
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            // Remove active class from all buttons
+            filterButtons.forEach((btn) => btn.classList.remove("active"));
+            // Add active class to clicked button
+            button.classList.add("active");
+
+            const filter = button.getAttribute("data-filter");
+
+            projectItems.forEach((item) => {
+              if (
+                filter === "all" ||
+                item.getAttribute("data-category") === filter
+              ) {
+                item.style.display = "block";
+              } else {
+                item.style.display = "none";
+              }
             });
-            
-            // Video handling with improved error handling
-            const videos = document.querySelectorAll('.project-video');
-            
-            videos.forEach(video => {
-                // Load the video
-                video.load();
-                
-                // Handle video loading errors
-                video.addEventListener('error', () => {
-                    console.error('Error loading video:', video.querySelector('source').src);
-                    const parent = video.parentElement;
-                    parent.innerHTML = `
+          });
+        });
+
+        // Video handling with improved error handling
+        const videos = document.querySelectorAll(".project-video");
+
+        videos.forEach((video) => {
+          // Load the video
+          video.load();
+
+          // Handle video loading errors
+          video.addEventListener("error", () => {
+            console.error(
+              "Error loading video:",
+              video.querySelector("source").src
+            );
+            const parent = video.parentElement;
+            parent.innerHTML = `
                         <div class="video-placeholder">
                             <div>
                                 <ion-icon name="alert-circle-outline" style="font-size: 2rem;"></ion-icon>
                                 <p>Video failed to load</p>
-                                <a href="${video.closest('a').href}" target="_blank" style="color: #ff8a00; text-decoration: underline;">
+                                <a href="${
+                                  video.closest("a").href
+                                }" target="_blank" style="color: #ff8a00; text-decoration: underline;">
                                     Click to view video
                                 </a>
                             </div>
                         </div>
                     `;
-                });
-                
-                // Try to play the video when it's in viewport
-                const playVideoWhenVisible = (entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const playPromise = entry.target.play();
-                            if (playPromise !== undefined) {
-                                playPromise.catch(error => {
-                                    // Autoplay was prevented, wait for user interaction
-                                    console.log('Autoplay prevented:', error);
-                                    entry.target.controls = true;
-                                });
-                            }
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                };
-                
-                // Set up Intersection Observer for videos
-                if ('IntersectionObserver' in window) {
-                    const videoObserver = new IntersectionObserver(playVideoWhenVisible, {
-                        rootMargin: '100px 0px',
-                        threshold: 0.1
-                    });
-                    videoObserver.observe(video);
-                } else {
-                    // Fallback for browsers without Intersection Observer
-                    video.play().catch(error => {
-                        console.log('Autoplay prevented:', error);
-                        video.controls = true;
-                    });
+          });
+
+          // Try to play the video when it's in viewport
+          const playVideoWhenVisible = (entries, observer) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const playPromise = entry.target.play();
+                if (playPromise !== undefined) {
+                  playPromise.catch((error) => {
+                    // Autoplay was prevented, wait for user interaction
+                    console.log("Autoplay prevented:", error);
+                    entry.target.controls = true;
+                  });
                 }
+                observer.unobserve(entry.target);
+              }
             });
-            
-            // Add click handlers to project items for better UX
-            projectItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    if (e.target.tagName !== 'A' && !e.target.closest('a')) {
-                        const link = item.querySelector('a');
-                        if (link) {
-                            if (link.getAttribute('href')?.startsWith('http') || link.getAttribute('href')?.startsWith('#')) {
-                                window.open(link.href, link.target || '_self');
-                            } else {
-                                // For video links, open in new tab
-                                window.open(link.href, '_blank');
-                            }
-                        }
-                    }
-                });
+          };
+
+          // Set up Intersection Observer for videos
+          if ("IntersectionObserver" in window) {
+            const videoObserver = new IntersectionObserver(
+              playVideoWhenVisible,
+              {
+                rootMargin: "100px 0px",
+                threshold: 0.1,
+              }
+            );
+            videoObserver.observe(video);
+          } else {
+            // Fallback for browsers without Intersection Observer
+            video.play().catch((error) => {
+              console.log("Autoplay prevented:", error);
+              video.controls = true;
             });
+          }
         });
+
+        // Add click handlers to project items for better UX
+        projectItems.forEach((item) => {
+          item.addEventListener("click", (e) => {
+            if (e.target.tagName !== "A" && !e.target.closest("a")) {
+              const link = item.querySelector("a");
+              if (link) {
+                if (
+                  link.getAttribute("href")?.startsWith("http") ||
+                  link.getAttribute("href")?.startsWith("#")
+                ) {
+                  window.open(link.href, link.target || "_self");
+                } else {
+                  // For video links, open in new tab
+                  window.open(link.href, "_blank");
+                }
+              }
+            }
+          });
+        });
+      });
     </script>
     <!--
     - custom js link
