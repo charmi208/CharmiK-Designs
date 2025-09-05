@@ -29,6 +29,86 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
+    <style>
+      .project-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        list-style: none;
+      }
+
+      .project-item {
+        background: #f5f5f5;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+
+      .project-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .project-img {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+      }
+
+      .project-video,
+      .project-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .project-item-icon-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.7);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        z-index: 2;
+      }
+
+      .project-title {
+        margin: 15px 15px 5px;
+        font-size: 18px;
+      }
+
+      .project-category {
+        margin: 0 15px 15px;
+        color: #666;
+      }
+
+      /* Loading animation for videos */
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      .video-loading {
+        animation: pulse 1.5s infinite;
+        background: #eee;
+      }
+    </style>
   </head>
 
   <body>
@@ -623,16 +703,39 @@
             </div>
 
             <ul class="project-list">
-             <li>
-  <a href="assets/images/monthly_video_grc_1.mp4" target="_blank">
-    <video muted autoplay loop playsinline preload="auto" style="max-width:100%;height:auto;">
-      <source src="assets/images/monthly_video_grc_1.mp4" type="video/mp4">
-    </video>
-  </a>
-  <h3>Video 1</h3>
-  <span class="category">Video</span>
-</li>
-
+              <li
+                class="project-item active"
+                data-filter-item
+                data-category="Video Editing"
+              >
+                <a
+                  href="assets/images/monthly_video_grc_1.mp4"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <figure class="project-img">
+                    <div class="project-item-icon-box">
+                      <ion-icon name="play-outline"></ion-icon>
+                    </div>
+                    <video
+                      class="project-video"
+                      muted
+                      loop
+                      playsinline
+                      preload="metadata"
+                      poster="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+                    >
+                      <source
+                        src="assets/images/monthly_video_grc_1.mp4"
+                        type="video/mp4"
+                      />
+                      Your browser does not support HTML5 video.
+                    </video>
+                  </figure>
+                  <h3 class="project-title">Video 1</h3>
+                  <p class="project-category">Video Editing</p>
+                </a>
+              </li>
               <!-- Video 2 -->
               <li
                 class="project-item active"
@@ -2194,38 +2297,91 @@
       </div>
     </main>
 
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        const vids = document.querySelectorAll("video[data-src]");
-        if ("IntersectionObserver" in window) {
-          const io = new IntersectionObserver(
-            (entries, obs) => {
-              entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                  const v = entry.target;
-                  const src = v.getAttribute("data-src");
-                  const source = v.querySelector("source");
-                  if (source && !source.src) {
-                    source.src = src;
-                    v.load();
-                  }
-                  obs.unobserve(v);
-                }
-              });
-            },
-            { rootMargin: "200px 0px" }
+        // Function to check if element is in viewport
+        function isInViewport(element) {
+          const rect = element.getBoundingClientRect();
+          return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <=
+              (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <=
+              (window.innerWidth || document.documentElement.clientWidth)
           );
+        }
 
-          vids.forEach((v) => io.observe(v));
-        } else {
-          vids.forEach((v) => {
-            const source = v.querySelector("source");
-            if (source && !source.src) {
-              source.src = v.getAttribute("data-src");
-              v.load();
+        // Function to handle video loading and play attempt
+        function handleVideoLoad(video) {
+          if (video.getAttribute("data-loaded") === "true") return;
+
+          // Try to play the video
+          const playPromise = video.play();
+
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                // Video played successfully
+                video.removeAttribute("poster");
+                video.setAttribute("data-loaded", "true");
+              })
+              .catch((error) => {
+                // Autoplay was prevented, wait for user interaction
+                console.log("Video autoplay prevented:", error);
+                video.setAttribute(
+                  "poster",
+                  "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+                );
+
+                // Add click handler to play on interaction
+                video
+                  .closest(".project-item")
+                  .addEventListener("click", function (e) {
+                    if (e.target.closest("a") && !video.playing) {
+                      video.play().catch((e) => console.log("Play failed:", e));
+                    }
+                  });
+              });
+          }
+        }
+
+        // Get all videos
+        const videos = document.querySelectorAll(".project-video");
+
+        // Initial check for videos in viewport
+        videos.forEach((video) => {
+          if (isInViewport(video)) {
+            handleVideoLoad(video);
+          }
+        });
+
+        // Check on scroll
+        window.addEventListener("scroll", () => {
+          videos.forEach((video) => {
+            if (isInViewport(video)) {
+              handleVideoLoad(video);
             }
           });
-        }
+        });
+
+        // Check on resize
+        window.addEventListener("resize", () => {
+          videos.forEach((video) => {
+            if (isInViewport(video)) {
+              handleVideoLoad(video);
+            }
+          });
+        });
       });
     </script>
 
